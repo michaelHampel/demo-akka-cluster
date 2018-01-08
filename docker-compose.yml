@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  dac:
+    image: hseeberger/demo-akka-cluster:latest
+    ports:
+      - 8000
+      - 19999
+    command: [
+      "-Dcassandra-journal.contact-points.0=cassandra:9042",
+      "-Dcassandra-snapshot-store.contact-points.0=cassandra:9042"
+    ]
+    shm_size: 256m
+
+  cassandra:
+    image: cassandra:3.11.1
+    ports:
+      - "9042:9042"
