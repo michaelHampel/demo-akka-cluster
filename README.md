@@ -1,6 +1,47 @@
-# demo-akka-cluster #
+# Akka Cluster Demo #
 
-Welcome to demo-akka-cluster!
+## Endpoints
+
+- GET /self-address: cluster address of the contacted node
+- GET /cluster/members: all cluster members
+
+Example:
+
+```
+~/projekte/github/rocks.heikoseeberger/demo-akka-cluster(master ✔) http :8000/self-address
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 18 Jan 2018 12:34:49 GMT
+Server: akka-http/10.0.11
+
+akka://dac@127.0.0.1:10000
+```
+
+## Run standalone
+
+Either run from within sbt with `reStart` (from sbt-revolver) or even better with the provided
+command aliases `r0` or `r1`. Or create a universal binary with `universal:packageBin`
+(from sbt-native-packager) and execute the launcher at `bin/demo-akka-cluster`.
+
+Provide the following JVM arguments:
+
+- Node zero (like in `r0`):
+  - -Ddac.api.port=8000
+  - -Dakka.management.http.port=20000
+  - -Dakka.remote.artery.canonical.hostname=127.0.0.1
+  - -Dakka.remote.artery.canonical.port=10000
+  - -Dakka.cluster.seed-nodes.0=akka://dac@127.0.0.1:10000 
+- Node one (likle in `r1`):
+  - -Ddac.api.port=8001
+  - -Dakka.management.http.port=20001
+  - -Dakka.remote.artery.canonical.hostname=127.0.0.1
+  - -Dakka.remote.artery.canonical.port=10001
+  - -Dakka.cluster.seed-nodes.0=akka://dac@127.0.0.1:10000
+  
+## Run in Docker
+
+Just use the provided Docker Compose file.
 
 ## Contribution policy ##
 
