@@ -16,20 +16,27 @@
 
 package rocks.heikoseeberger.dac
 
-import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.{ ActorSystem, CoordinatedShutdown }
 import akka.cluster.Cluster
 import akka.management.AkkaManagement
 import akka.management.cluster.bootstrap.ClusterBootstrap
-import akka.actor.typed.Behavior
+import akka.actor.typed.{ ActorRef, Behavior, Terminated }
 import akka.actor.typed.scaladsl.Actor
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.{ ActorMaterializer, Materializer }
 import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 import org.apache.logging.log4j.scala.Logging
+import pureconfig.loadConfigOrThrow
 
 object Main extends Logging {
 
+  private case class TopLevelActorTerminated(actor: ActorRef[Nothing]) extends Reason
+
   def main(args: Array[String]): Unit = {
     sys.props += "log4j2.contextSelector" -> classOf[AsyncLoggerContextSelector].getName
+
+    val config = loadConfigOrThrow[Config]("dac")
 
     val system  = ActorSystem("dac")
     val cluster = Cluster(system)
@@ -37,13 +44,29 @@ object Main extends Logging {
     AkkaManagement(system).start()
     ClusterBootstrap(system).start()
 
-    cluster.registerOnMemberUp(system.spawn[Nothing](Main(), "main"))
+    cluster.registerOnMemberUp(system.spawn[Nothing](Main(config, cluster), "main"))
     logger.info("System started and trying to join cluster")
   }
 
-  def apply(): Behavior[Nothing] =
+  def apply(config: Config, cluster: Cluster): Behavior[Nothing] =
     Actor.deferred[Nothing] { context =>
+      import akka.actor.typed.scaladsl.adapter._
+
+      implicit val mat: Materializer = ActorMaterializer()(context.system.toUntyped)
+
+      val api = {
+        import config.api._
+        context.spawn(Api(address, port, cluster.selfAddress), Api.Name)
+      }
+
+      context.watch(api)
       logger.info("System up and running")
-      Actor.empty[Nothing]
+
+      Actor.onSignal[Nothing] {
+        case (_, Terminated(actor)) =>
+          logger.error(s"Shutting down, because actor ${actor.path} terminated!")
+          CoordinatedShutdown(context.system.toUntyped).run(TopLevelActorTerminated(actor))
+          Actor.empty
+      }
     }
 }
