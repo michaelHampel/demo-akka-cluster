@@ -12,7 +12,7 @@ lazy val `demo-akka-cluster` =
         library.akkaClusterShardingTyped,
         library.akkaManagementClusterBootstrap,
         library.akkaManagementClusterHttp,
-        library.akkaDiscoveryDns,
+        library.akkaDiscoveryK8s,
         library.akkaHttp,
         library.akkaHttpCirce,
         library.akkaLog4j,
@@ -51,6 +51,7 @@ lazy val library =
     val akkaManagementClusterBootstrap = "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % Version.akkaManagement
     val akkaManagementClusterHttp      = "com.lightbend.akka.management" %% "akka-management-cluster-http"      % Version.akkaManagement
     val akkaDiscoveryDns               = "com.lightbend.akka.discovery"  %% "akka-discovery-dns"                % Version.akkaManagement
+    val akkaDiscoveryK8s               = "com.lightbend.akka.discovery"  %% "akka-discovery-kubernetes-api"     % Version.akkaManagement
     val akkaHttp                       = "com.typesafe.akka"             %% "akka-http"                         % Version.akkaHttp
     val akkaHttpCirce                  = "de.heikoseeberger"             %% "akka-http-circe"                   % Version.akkaHttpJson
     val akkaLog4j                      = "de.heikoseeberger"             %% "akka-log4j"                        % Version.akkaLog4j
@@ -80,8 +81,8 @@ lazy val commonSettings =
   Seq(
     // scalaVersion from .travis.yml via sbt-travisci
     // scalaVersion := "2.12.4",
-    organization := "rocks.heikoseeberger",
-    organizationName := "Heiko Seeberger",
+    organization := "com.mh",
+    organizationName := "mh",
     startYear := Some(2018),
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scalacOptions ++= Seq(
@@ -111,11 +112,11 @@ lazy val scalafmtSettings =
 lazy val dockerSettings =
   Seq(
     Docker / daemonUser := "root",
-    Docker / maintainer := "Heiko Seeberger",
+    Docker / maintainer := "delasoul",
     Docker / version := "latest",
     dockerBaseImage := "openjdk:8u151-slim",
     dockerExposedPorts := Vector(8000),
-    dockerRepository := Some("hseeberger")
+    dockerRepository := Some("delasoul")
   )
 
 lazy val commandAliases =

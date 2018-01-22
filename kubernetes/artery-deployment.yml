@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: dac
+  name: dac
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: dac
+  template:
+    metadata:
+      labels:
+        app: dac
+    spec:
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      containers:
+      - name: dac
+        image: delasoul/demo-akka-cluster:latest
+        imagePullPolicy: Never
+        ports:
+        # akka remoting
+        - name: remoting
+          containerPort: 25520
+          protocol: TCP
+        # akka-management bootstrap
+        - name: akka-mgmt-http
+          containerPort: 8558
+          protocol: TCP
+        # external http
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
