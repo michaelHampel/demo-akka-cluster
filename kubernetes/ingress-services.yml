@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cluster-http-mgmt
+spec:
+  ports:
+  - port: 19999
+    targetPort: akka-mgmt-http
+  selector:
+    app: dac
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dac-service
+spec:
+  ports:
+  - port: 8080
+    targetPort: http
+  selector:
+    app: dac

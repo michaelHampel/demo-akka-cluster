@@ -6,4 +6,5 @@ services:
     ports:
       - 8080
       - 19999
-    shm_size: 256m
+      - 25520
+    shm_size: 1G

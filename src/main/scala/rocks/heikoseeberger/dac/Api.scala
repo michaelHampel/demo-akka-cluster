@@ -79,6 +79,11 @@ object Api extends Logging {
       get {
         complete(selfAddress.toString)
       }
+    } ~
+    path("hello") {
+      get {
+        complete("Hello, from DAC Service...")
+      }
     }
   }
 }

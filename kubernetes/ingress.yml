@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cluster-ingress
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+  -  host: mh.com
+     http:
+       paths:
+       -  path: /
+          backend:
+            serviceName: dac-service
+            servicePort: 8080
+       -  path: /cluster
+          backend:
+            serviceName: cluster-http-mgmt
+            servicePort: 19999
