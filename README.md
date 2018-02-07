@@ -1,5 +1,12 @@
 # Akka Cluster Demo #
 
+added different configurations to run on Kubernetes - locally tested with Minikube
+For Kubernetes you can use
+- [DNS-Discovery](https://developer.lightbend.com/docs/akka-management/current/discovery.html#discovery-method-akka-dns-discovery)  or
+- the [Kubernetes API](https://developer.lightbend.com/docs/akka-management/current/discovery.html#discovery-method-kubernetes-api)
+
+from the [Akka Management](https://developer.lightbend.com/docs/akka-management/current/index.html) project to start your Akka Cluster.
+
 ## Endpoints
 
 - GET /self-address: cluster address of the contacted node
@@ -31,14 +38,14 @@ Provide the following JVM arguments:
   - -Dakka.management.http.port=20000
   - -Dakka.remote.artery.canonical.hostname=127.0.0.1
   - -Dakka.remote.artery.canonical.port=10000
-  - -Dakka.cluster.seed-nodes.0=akka://dac@127.0.0.1:10000 
+  - -Dakka.cluster.seed-nodes.0=akka://dac@127.0.0.1:10000
 - Node one (likle in `r1`):
   - -Ddac.api.port=8001
   - -Dakka.management.http.port=20001
   - -Dakka.remote.artery.canonical.hostname=127.0.0.1
   - -Dakka.remote.artery.canonical.port=10001
   - -Dakka.cluster.seed-nodes.0=akka://dac@127.0.0.1:10000
-  
+
 ## Run in Docker
 
 Just use the provided Docker Compose file.
