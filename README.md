@@ -14,7 +14,7 @@ All yml files are in the kubernetes directory.
 ## Basic Setup
 
 - Install [minikube](https://github.com/kubernetes/minikube)
-- clone the project
+- clone this project
 - start minikube e.g.: `minikube start --memory=6000` if using hyperkit/xhyve [see](https://github.com/kubernetes/minikube/issues/951)
 - set docker environment to minikube: `eval $(minikube docker-env)`
 - change application.conf for either using dns or kubernetes discovery and to enable Artery for Akka remote.
@@ -32,13 +32,15 @@ This creates a deployment with 4 replicas of the dac demo app. Each pod exposes 
 Additionally a headless service for DNS discovery is deployed.
 
 To verify either open the minikube dashboard and look at the logs of the deployed pods or use the commandline:
-`POD=$(kubectl get pods | grep dac | grep Running | head -n1 | awk '{ print $1 }'); echo $POD`
-`kubectl logs $POD -f`
+- `POD=$(kubectl get pods | grep dac | grep Running | head -n1 | awk '{ print $1 }'); echo $POD`
+- `kubectl logs $POD -f`
 
 If the returned pod id is the oldest node you should see smthg. like:
 
 ```
-16:30:33 INFO  Cluster(akka://dac) [akka.cluster.Cluster(akka://dac)] - Cluster Node [akka.tcp://dac@172.17.0.10:2552] - Leader is moving node [akka.tcp://dac@172.17.0.8:2552] to [Up]
+16:30:33 INFO  Cluster(akka://dac) [akka.cluster.Cluster(akka://dac)] -
+Cluster Node [akka.tcp://dac@172.17.0.10:2552] -
+Leader is moving node [akka.tcp://dac@172.17.0.8:2552] to [Up]
 ```
 
 for each replica's port.
@@ -69,7 +71,14 @@ Configurations to access the Akka HTTP Mgmt API as well as the HTTP API of the D
 Example:
 
 ```
-{"selfNode":"akka.tcp://dac@172.17.0.10:2552","leader":"akka.tcp://dac@172.17.0.10:2552","oldest":"akka.tcp://dac@172.17.0.10:2552","unreachable":[],"members":[{"node":"akka.tcp://dac@172.17.0.10:2552","nodeUid":"2028087476","status":"Up","roles":["dc-default"]},{"node":"akka.tcp://dac@172.17.0.11:2552","nodeUid":"-1150166493","status":"Up","roles":["dc-default"]},{"node":"akka.tcp://dac@172.17.0.8:2552","nodeUid":"1696269376","status":"Up","roles":["dc-default"]},{"node":"akka.tcp://dac@172.17.0.9:2552","nodeUid":"782644251","status":"Up","roles":["dc-default"]}]}
+{"selfNode":"akka.tcp://dac@172.17.0.10:2552",
+"leader":"akka.tcp://dac@172.17.0.10:2552",
+"oldest":"akka.tcp://dac@172.17.0.10:2552","unreachable":[],
+"members":[
+{"node":"akka.tcp://dac@172.17.0.10:2552","nodeUid":"2028087476","status":"Up","roles":["dc-default"]},
+{"node":"akka.tcp://dac@172.17.0.11:2552","nodeUid":"-1150166493","status":"Up","roles":["dc-default"]},
+{"node":"akka.tcp://dac@172.17.0.8:2552","nodeUid":"1696269376","status":"Up","roles":["dc-default"]},
+{"node":"akka.tcp://dac@172.17.0.9:2552","nodeUid":"782644251","status":"Up","roles":["dc-default"]}]}
 ```
 
 ## Ingress
