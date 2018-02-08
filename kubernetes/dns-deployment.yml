@@ -37,10 +37,11 @@ apiVersion: v1
 metadata:
   name: dac-headless-service
 spec:
+  # clusterIP to None == headless service
   clusterIP: None
   selector:
     app: dac
   ports:
   - protocol: TCP
     port: 8558
-    targetPort: akka-mgmt-http 
+    targetPort: akka-mgmt-http
