@@ -17,15 +17,16 @@
 package rocks.heikoseeberger.dac
 
 import akka.Done
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.Actor
 import akka.actor.{ ActorSystem, Address, CoordinatedShutdown }
+import akka.actor.typed.Behavior
 import akka.actor.CoordinatedShutdown.PhaseServiceUnbind
+import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.{ Directives, Route }
 import akka.stream.Materializer
 import org.apache.logging.log4j.scala.Logging
+
 import scala.util.{ Failure, Success }
 
 object Api extends Logging {
@@ -40,11 +41,11 @@ object Api extends Logging {
   def apply(address: String, port: Int, selfAddress: Address)(
       implicit mat: Materializer
   ): Behavior[Command] =
-    Actor.deferred { context =>
+    Behaviors.setup { context =>
       import akka.actor.typed.scaladsl.adapter._
-      import context.executionContext
 
       implicit val system: ActorSystem = context.system.toUntyped
+      implicit val executionContext    = context.executionContext
       val self                         = context.self
 
       Http()
@@ -54,10 +55,10 @@ object Api extends Logging {
           case Success(binding) => self ! HandleBound(binding)
         }
 
-      Actor.immutablePartial {
+      Behaviors.receivePartial {
         case (_, HandleBindFailure) =>
           logger.error(s"Stopping, because cannot bind to $address:$port!")
-          Actor.stopped
+          Behaviors.stopped
 
         case (_, HandleBound(binding)) =>
           logger.info(s"Bound to ${binding.localAddress}")
@@ -67,8 +68,8 @@ object Api extends Logging {
               Done
             }
           }
-          Actor.immutablePartial {
-            case (_, Stop) => Actor.stopped
+          Behaviors.receivePartial {
+            case (_, Stop) => Behaviors.stopped
           }
       }
     }

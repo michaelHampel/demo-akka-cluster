@@ -17,12 +17,12 @@
 package rocks.heikoseeberger.dac
 
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.{ ActorSystem, CoordinatedShutdown }
 import akka.cluster.Cluster
 import akka.management.AkkaManagement
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.actor.typed.{ ActorRef, Behavior, Terminated }
-import akka.actor.typed.scaladsl.Actor
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ ActorMaterializer, Materializer }
 import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
@@ -49,7 +49,7 @@ object Main extends Logging {
   }
 
   def apply(config: Config, cluster: Cluster): Behavior[Nothing] =
-    Actor.deferred[Nothing] { context =>
+    Behaviors.setup[Nothing] { context =>
       import akka.actor.typed.scaladsl.adapter._
 
       implicit val mat: Materializer = ActorMaterializer()(context.system.toUntyped)
@@ -62,11 +62,11 @@ object Main extends Logging {
       context.watch(api)
       logger.info("System up and running")
 
-      Actor.onSignal[Nothing] {
+      Behaviors.receiveSignal[Nothing] {
         case (_, Terminated(actor)) =>
           logger.error(s"Shutting down, because actor ${actor.path} terminated!")
           CoordinatedShutdown(context.system.toUntyped).run(TopLevelActorTerminated(actor))
-          Actor.empty
+          Behaviors.empty
       }
     }
 }

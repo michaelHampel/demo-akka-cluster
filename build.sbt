@@ -13,6 +13,7 @@ lazy val `demo-akka-cluster` =
         library.akkaManagementClusterBootstrap,
         library.akkaManagementClusterHttp,
         library.akkaDiscoveryK8s,
+        //library.akkaDiscoveryDns,
         library.akkaHttp,
         library.akkaHttpCirce,
         library.akkaLog4j,
@@ -33,11 +34,11 @@ lazy val `demo-akka-cluster` =
 lazy val library =
   new {
     object Version {
-      val akka           = "2.5.9"
-      val akkaHttp       = "10.0.11"
+      val akka           = "2.5.14"
+      val akkaHttp       = "10.1.3"
       val akkaHttpJson   = "1.19.0"
       val akkaLog4j      = "1.6.0"
-      val akkaManagement = "0.10.0"
+      val akkaManagement = "0.17.0"
       val circe          = "0.9.0"
       val disruptor      = "3.3.7"
       val log4j          = "2.10.0"
