@@ -18,6 +18,7 @@ lazy val `demo-akka-cluster` =
         library.akkaHttpCirce,
         library.akkaLog4j,
         library.akkaStream,
+        library.akkaClusterDowning,
         library.circeGeneric,
         library.disruptor,
         library.log4jApiScala,
@@ -34,19 +35,20 @@ lazy val `demo-akka-cluster` =
 lazy val library =
   new {
     object Version {
-      val akka           = "2.5.14"
-      val akkaHttp       = "10.1.3"
-      val akkaHttpJson   = "1.19.0"
-      val akkaLog4j      = "1.6.0"
-      val akkaManagement = "0.17.0"
-      val circe          = "0.9.0"
-      val disruptor      = "3.3.7"
-      val log4j          = "2.10.0"
-      val log4jApiScala  = "11.0"
-      val pureConfig     = "0.9.0"
-      val scalaCheck     = "1.13.5"
-      val scalapb        = com.trueaccord.scalapb.compiler.Version.scalapbVersion
-      val utest          = "0.6.3"
+      val akka                = "2.5.14"
+      val akkaHttp            = "10.1.3"
+      val akkaHttpJson        = "1.19.0"
+      val akkaLog4j           = "1.6.0"
+      val akkaManagement      = "0.17.0"
+      val akkaClusterDowning  = "0.0.12"
+      val circe               = "0.9.0"
+      val disruptor           = "3.3.7"
+      val log4j               = "2.10.0"
+      val log4jApiScala       = "11.0"
+      val pureConfig          = "0.9.0"
+      val scalaCheck          = "1.13.5"
+      val scalapb             = com.trueaccord.scalapb.compiler.Version.scalapbVersion
+      val utest               = "0.6.3"
     }
     val akkaClusterShardingTyped       = "com.typesafe.akka"             %% "akka-cluster-sharding-typed"       % Version.akka
     val akkaManagementClusterBootstrap = "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % Version.akkaManagement
@@ -57,6 +59,7 @@ lazy val library =
     val akkaHttpCirce                  = "de.heikoseeberger"             %% "akka-http-circe"                   % Version.akkaHttpJson
     val akkaLog4j                      = "de.heikoseeberger"             %% "akka-log4j"                        % Version.akkaLog4j
     val akkaStream                     = "com.typesafe.akka"             %% "akka-stream"                       % Version.akka
+    val akkaClusterDowning             = "com.github.TanUkkii007"        %% "akka-cluster-custom-downing"       % Version.akkaClusterDowning
     val circeGeneric                   = "io.circe"                      %% "circe-generic"                     % Version.circe
     val disruptor                      = "com.lmax"                      %  "disruptor"                         % Version.disruptor
     val log4jApiScala                  = "org.apache.logging.log4j"      %% "log4j-api-scala"                   % Version.log4jApiScala
