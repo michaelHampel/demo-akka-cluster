@@ -45,7 +45,9 @@ object Main extends Logging {
     AkkaManagement(system).start()
     ClusterBootstrap(system).start()
 
+    // start HTTP server and application after node joined the cluster
     cluster.registerOnMemberUp(system.spawn[Nothing](Main(config, cluster), "main"))
+
     logger.info("System started and trying to join cluster")
   }
 
@@ -63,6 +65,7 @@ object Main extends Logging {
       context.watch(api)
       logger.info("System up and running")
 
+      // Handle termination of API actor
       Behaviors.receiveSignal[Nothing] {
         case (_, Terminated(actor)) =>
           logger.error(s"Shutting down, because actor ${actor.path} terminated!")

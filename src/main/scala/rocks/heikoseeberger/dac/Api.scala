@@ -26,6 +26,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.{ Directives, Route }
 import akka.stream.Materializer
 import org.apache.logging.log4j.scala.Logging
+import scala.concurrent.duration._
 
 import scala.util.{ Failure, Success }
 
@@ -63,7 +64,7 @@ object Api extends Logging {
         case (_, HandleBound(binding)) =>
           logger.info(s"Bound to ${binding.localAddress}")
           CoordinatedShutdown(system).addTask(PhaseServiceUnbind, "api-unbind") { () =>
-            binding.unbind().map { _ =>
+            binding.terminate(5 seconds).map { _ =>
               self ! Stop
               Done
             }
@@ -74,7 +75,9 @@ object Api extends Logging {
       }
     }
 
-  def route(selfAddress: Address): Route = {
+  private def route(selfAddress: Address): Route = {
+    val systemRoutes = new SystemRoutes
+
     import Directives._
     path("self-address") {
       get {
@@ -85,6 +88,7 @@ object Api extends Logging {
       get {
         complete("Hello, from DAC Service...")
       }
-    }
+    } ~
+    pathPrefix("system")(systemRoutes.route)
   }
 }
