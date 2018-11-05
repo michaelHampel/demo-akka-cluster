@@ -5,7 +5,7 @@ metadata:
     app: dac
   name: dac
 spec:
-  replicas: 4
+  replicas: 5
   selector:
     matchLabels:
       app: dac
@@ -22,6 +22,9 @@ spec:
       containers:
       - name: dac
         image: delasoul/demo-akka-cluster:latest
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
         imagePullPolicy: Never
         env:
         - name: HOSTNAME

@@ -27,6 +27,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ ActorMaterializer, Materializer }
 import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 import org.apache.logging.log4j.scala.Logging
+import pureconfig.generic.auto._
 import pureconfig.loadConfigOrThrow
 
 object Main extends Logging {

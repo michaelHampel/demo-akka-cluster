@@ -8,6 +8,8 @@ lazy val `demo-akka-cluster` =
     .enablePlugins(AutomateHeaderPlugin, GitVersioning, DockerPlugin, JavaAppPackaging)
     .settings(settings)
     .settings(
+      bashScriptExtraDefines ++= IO.readLines(baseDirectory.value / "native_packager_parameter.sh"),
+      javaOptions in Universal ++= globalJavaOptions,
       libraryDependencies ++= Seq(
         library.akkaClusterShardingTyped,
         library.akkaManagementClusterBootstrap,
@@ -35,17 +37,17 @@ lazy val `demo-akka-cluster` =
 lazy val library =
   new {
     object Version {
-      val akka                = "2.5.14"
-      val akkaHttp            = "10.1.3"
-      val akkaHttpJson        = "1.19.0"
-      val akkaLog4j           = "1.6.0"
-      val akkaManagement      = "0.17.0"
-      val akkaClusterDowning  = "0.0.12"
-      val circe               = "0.9.0"
-      val disruptor           = "3.3.7"
-      val log4j               = "2.10.0"
+      val akka                = "2.5.17"
+      val akkaHttp            = "10.1.5"
+      val akkaHttpCirce       = "1.21.0"
+      val akkaLog4j           = "1.6.1"
+      val akkaManagement      = "0.18.0"
+      val akkaClusterDowning  = "0.0.14-SNAPSHOT"
+      val circeGeneric        = "0.9.3"
+      val disruptor           = "3.4.2"
+      val log4j               = "2.11.0"
       val log4jApiScala       = "11.0"
-      val pureConfig          = "0.9.0"
+      val pureConfig          = "0.10.0"
       val scalaCheck          = "1.13.5"
       val scalapb             = com.trueaccord.scalapb.compiler.Version.scalapbVersion
       val utest               = "0.6.3"
@@ -56,11 +58,11 @@ lazy val library =
     val akkaDiscoveryDns               = "com.lightbend.akka.discovery"  %% "akka-discovery-dns"                % Version.akkaManagement
     val akkaDiscoveryK8s               = "com.lightbend.akka.discovery"  %% "akka-discovery-kubernetes-api"     % Version.akkaManagement
     val akkaHttp                       = "com.typesafe.akka"             %% "akka-http"                         % Version.akkaHttp
-    val akkaHttpCirce                  = "de.heikoseeberger"             %% "akka-http-circe"                   % Version.akkaHttpJson
+    val akkaHttpCirce                  = "de.heikoseeberger"             %% "akka-http-circe"                   % Version.akkaHttpCirce
     val akkaLog4j                      = "de.heikoseeberger"             %% "akka-log4j"                        % Version.akkaLog4j
     val akkaStream                     = "com.typesafe.akka"             %% "akka-stream"                       % Version.akka
     val akkaClusterDowning             = "com.github.TanUkkii007"        %% "akka-cluster-custom-downing"       % Version.akkaClusterDowning
-    val circeGeneric                   = "io.circe"                      %% "circe-generic"                     % Version.circe
+    val circeGeneric                   = "io.circe"                      %% "circe-generic"                     % Version.circeGeneric
     val disruptor                      = "com.lmax"                      %  "disruptor"                         % Version.disruptor
     val log4jApiScala                  = "org.apache.logging.log4j"      %% "log4j-api-scala"                   % Version.log4jApiScala
     val log4jCore                      = "org.apache.logging.log4j"      %  "log4j-core"                        % Version.log4j
@@ -76,6 +78,7 @@ lazy val library =
 
 lazy val settings =
   commonSettings ++
+  sbtSettings ++
   gitSettings ++
   scalafmtSettings ++
   dockerSettings ++
@@ -102,6 +105,21 @@ lazy val commonSettings =
     Compile / packageSrc / publishArtifact := false,
     testFrameworks += new TestFramework("utest.runner.Framework")
 )
+
+// Java Options set via sbt have to be added explicitly to native packager
+// Maintain the list here and reference in relevant scopes.
+lazy val globalJavaOptions = Seq(
+  // See https://logging.apache.org/log4j/2.x/manual/async.html for using async logger
+  "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
+  // This service is headless.
+  "-Djava.awt.headless=true"
+)
+
+lazy val sbtSettings =
+  Seq(
+    fork := true,
+    cancelable in Global := true
+  )
 
 lazy val gitSettings =
   Seq(
