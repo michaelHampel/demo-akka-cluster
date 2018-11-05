@@ -14,6 +14,8 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
+  # mark deployment as failed, if not finished within 60 seconds
+  progressDeadlineSeconds: 60
   template:
     metadata:
       labels:
@@ -26,7 +28,16 @@ spec:
       containers:
       - name: dac
         image: delasoul/demo-akka-cluster:latest
-        imagePullPolicy: Never
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
+          imagePullPolicy: Never
+          env:
+          - name: HOSTNAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
         ports:
         # akka remoting
         - name: remoting
@@ -43,6 +54,34 @@ spec:
         volumeMounts:
         - mountPath: /dev/shm
           name: dshm
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /system/readiness
+            port: 8080
+          initialDelaySeconds: 15
+          timeoutSeconds: 2
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /system/liveness
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 2
+          periodSeconds: 5
+          failureThreshold: 3
+        lifecycle:
+          preStop:
+            exec:
+              # Create file for readiness probe
+              # waiting for readiness check to fail
+              # readiness check is responsible to stop traffic to container before shutting down
+              # sleep time is based on the time the readiness check needs to fail:
+              # readinessProbe.failureThreshold * readinessProbe.periodSeconds + readinessProbe.periodSeconds
+              command:
+                ["/bin/bash", "-c", "touch /tmp/shutdown && sleep 8"]
 
 ---
 
