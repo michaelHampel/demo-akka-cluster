@@ -25,6 +25,9 @@ spec:
       - name: dshm
         emptyDir:
           medium: Memory
+      # Termination grace period calculates as:
+      # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
+      terminationGracePeriodSeconds: 23
       containers:
       - name: dac
         image: delasoul/demo-akka-cluster:latest
